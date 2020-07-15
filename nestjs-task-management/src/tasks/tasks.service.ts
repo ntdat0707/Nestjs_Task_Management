@@ -22,8 +22,8 @@ export class TasksService {
             tasks = tasks.filter(task => task.status === status);
         }
         if (search) {
-            tasks = tasks.filter(task => task.status.includes(search) || 
-            task.description.includes(search));
+            tasks = tasks.filter(task => task.status.includes(search) ||
+                task.description.includes(search));
         }
         return tasks;
     }
@@ -40,6 +40,11 @@ export class TasksService {
         return 'New Task is added';
     }
 
+    updateTask(id: string, status: TaskStatus): Task {
+        let task = this.getTaskById(id);
+        task.status = status;
+        return task;
+    }
     deleteTask(taskId: string): string {
         let index = this.tasks.indexOf(this.tasks.find(task => task.id === taskId));
         // let task = this.tasks.find(task => task.id === taskId);
