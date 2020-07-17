@@ -6,6 +6,9 @@ import { GetTaskFilterDTO } from './dto/get-task-filter-dto';
 import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
 import { JwtAuthGuard } from 'src/auth/auth-dto/jwt-auth.guard';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from '../auth/user.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -13,13 +16,18 @@ export class TasksController {
   constructor(private tasksService: TasksService) { }
 
   @Get()
-  getTasks(@Query(ValidationPipe) taskfiltered: GetTaskFilterDTO): Promise<Task[]> {
-    return this.tasksService.getTasks(taskfiltered);
+  getTasks(
+    @Query(ValidationPipe) taskfiltered: GetTaskFilterDTO,
+    @GetUser() user: User,
+  ): Promise<Task[]> {
+    return this.tasksService.getTasks(taskfiltered, user);
   }
 
   @Get('/:id')
-  getTaskById(@Param('id', ParseIntPipe) id: number): Promise<Task> {
-    return this.tasksService.getTaskById(id);
+  getTaskById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User): Promise<Task> {
+    return this.tasksService.getTaskById(id, user);
   }
 
   // @Get()
@@ -30,19 +38,26 @@ export class TasksController {
   @Post()
   @UsePipes(ValidationPipe)
   createTask(
-    @Body() createTaskDTO: CreateTaskDTO
+    @Body() createTaskDTO: CreateTaskDTO,
+    @GetUser() user: User,
   ): Promise<Task> {
-    return this.tasksService.createTask(createTaskDTO);
+    return this.tasksService.createTask(createTaskDTO, user);
   }
 
   @Patch('/:id/status')
-  updateTask(@Param('id', ParseIntPipe) id: number, @Body('status', TaskStatusValidationPipes) status: TaskStatus): Promise<Task> {
-    return this.tasksService.updateTask(id, status);
+  updateTask(
+      @Param('id', ParseIntPipe) id: number,
+      @Body('status', TaskStatusValidationPipes) status: TaskStatus,
+      @GetUser() user: User
+      ): Promise<Task> {
+    return this.tasksService.updateTask(id, status,user);
   }
 
   @Delete('/:id')
-  deleteTask(@Param('id', ParseIntPipe) id: number): Promise<string> {
-    return this.tasksService.deleteTask(id);
+  deleteTask(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User): Promise<string> {
+    return this.tasksService.deleteTask(id,user);
   }
 
 }
