@@ -5,17 +5,23 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './auth-dto/jwt-auth.guard';
 import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
+import { ApiCreatedResponse, ApiOkResponse, ApiUnauthorizedResponse, ApiBody } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) { }
 
     @Post('/signup')
+    @ApiCreatedResponse({ description: 'User Registration' })
+    @ApiBody({ type: AuthDTO })
     signUp(@Body(ValidationPipe) authDTO: AuthDTO): Promise<string> {
         return this.authService.signUp(authDTO);
     }
 
     @Post('/signin')
+    @ApiOkResponse({ description: 'User Login' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: AuthDTO })
     signIn(@Body(ValidationPipe) authDTO: AuthDTO): Promise<{ accessToken: string }> {
         return this.authService.signIn(authDTO);
     }
